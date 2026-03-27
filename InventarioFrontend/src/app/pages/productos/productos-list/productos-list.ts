@@ -8,6 +8,7 @@ import { Categoria } from '../../../core/models/categoria.model';
 import { ProductoService } from '../../../core/services/producto-service';
 import { CategoriaService } from '../../../core/services/categoria-service';
 import { AlertService } from '../../../core/services/alert-service';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-productos-list',
@@ -17,9 +18,11 @@ import { AlertService } from '../../../core/services/alert-service';
   styleUrl: './productos-list.css',
 })
 export class ProductosList implements OnInit {
-    productos: Producto[] = [];
+  productos: Producto[] = [];
   categorias: Categoria[] = [];
   loading = false;
+
+  apiBaseUrl = environment.apiBase;
 
   filtro: ProductoFilter = {
     nombre: '',
@@ -51,7 +54,7 @@ export class ProductosList implements OnInit {
     private productoService: ProductoService,
     private categoriaService: CategoriaService,
     private alertService: AlertService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.cargarCategorias();
@@ -134,5 +137,20 @@ export class ProductosList implements OnInit {
 
   nombreCategoria(idCategoria: number): string {
     return this.categorias.find(c => c.idCategoria === idCategoria)?.nombre ?? '—';
+  }
+
+  onImageListError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    img.style.display = 'none';
+  }
+
+  getImageUrl(imagenUrl?: string | null): string {
+    if (!imagenUrl) return '';
+
+    if (imagenUrl.startsWith('http://') || imagenUrl.startsWith('https://')) {
+      return imagenUrl;
+    }
+
+    return `${this.apiBaseUrl}${imagenUrl}`;
   }
 }

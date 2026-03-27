@@ -137,3 +137,41 @@
   border-width: 2px;
   display: inline-block;
 }
+
+
+
+.d-none {
+  display: none;
+}
+
+.image-upload-box {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.image-upload-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.upload-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.text-success {
+  color: #198754;
+}
+
+.mt-8 {
+  margin-top: 8px;
+}
+
+.upload-help-text {
+  font-size: 12px;
+  color: #6c757d;
+}

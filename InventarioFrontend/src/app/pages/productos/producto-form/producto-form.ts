@@ -8,6 +8,7 @@ import { CategoriaService } from '../../../core/services/categoria-service';
 import { AlertService } from '../../../core/services/alert-service';
 import { ProductoRequest } from '../../../core/models/producto.model';
 import { Observable } from 'rxjs';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-producto-form',
@@ -23,6 +24,11 @@ export class ProductoForm implements OnInit {
   saving = false;
   modoEdicion = false;
   productoId?: number;
+
+  apiBaseUrl = environment.apiBase;
+
+  uploadingImage = false;
+  selectedFileName = '';
 
   constructor(
     private fb: FormBuilder,
@@ -106,10 +112,65 @@ export class ProductoForm implements OnInit {
   }
 
   onImgError(event: Event): void {
-    (event.target as HTMLImageElement).style.display = 'none';
+    const img = event.target as HTMLImageElement;
+    img.style.display = 'none';
+  }
+
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+
+    if (!input.files || input.files.length === 0) {
+      return;
+    }
+
+    const file = input.files[0];
+
+    const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      this.alertService.warning('Precaución', 'Solo se permiten imágenes PNG, JPG, JPEG o WEBP');
+      input.value = '';
+      return;
+    }
+
+    const maxSizeBytes = 5 * 1024 * 1024;
+    if (file.size > maxSizeBytes) {
+      this.alertService.warning('Precaución', 'La imagen no debe superar los 5 MB');
+      input.value = '';
+      return;
+    }
+
+    this.selectedFileName = file.name;
+    this.subirImagen(file);
+  }
+
+  private subirImagen(file: File): void {
+    this.uploadingImage = true;
+
+    this.productoService.uploadImage(file).subscribe({
+      next: (res) => {
+        this.form.patchValue({
+          imagenUrl: res.imageUrl
+        });
+
+        this.form.get('imagenUrl')?.markAsTouched();
+        this.uploadingImage = false;
+        this.alertService.toastSuccess('Imagen subida correctamente');
+      },
+      error: (err: any) => {
+        this.uploadingImage = false;
+        this.selectedFileName = '';
+        const mensaje = err?.error?.message || 'No se pudo subir la imagen';
+        this.alertService.error('Error', mensaje);
+      }
+    });
   }
 
   guardar(): void {
+    if (this.uploadingImage) {
+      this.alertService.warning('Precaución', 'Espere a que termine la subida de la imagen');
+      return;
+    }
+
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       this.alertService.warning('Precaución', 'Por favor complete correctamente los campos requeridos');
@@ -152,5 +213,17 @@ export class ProductoForm implements OnInit {
         this.alertService.error('Error', mensaje);
       }
     });
+  }
+
+  getImagenPreviewUrl(): string {
+    const imagenUrl = this.form.get('imagenUrl')?.value;
+
+    if (!imagenUrl) return '';
+
+    if (imagenUrl.startsWith('http://') || imagenUrl.startsWith('https://')) {
+      return imagenUrl;
+    }
+
+    return `${this.apiBaseUrl}${imagenUrl}`;
   }
 }

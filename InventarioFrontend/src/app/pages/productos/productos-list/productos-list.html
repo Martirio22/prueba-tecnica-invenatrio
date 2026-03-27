@@ -88,7 +88,8 @@
             </td>
 
             <td>
-              <img *ngIf="p.imagenUrl; else noImg" [src]="p.imagenUrl" class="product-img" [alt]="p.nombre" />
+              <img *ngIf="p.imagenUrl; else noImg" [src]="getImageUrl(p.imagenUrl)" class="product-img" [alt]="p.nombre"
+                (error)="onImageListError($event)" />
               <ng-template #noImg>
                 <div class="product-img-placeholder">
                   <i class="fa-solid fa-image"></i>

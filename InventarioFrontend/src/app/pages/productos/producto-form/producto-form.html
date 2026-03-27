@@ -62,16 +62,6 @@
           </div>
 
           <div class="form-group">
-            <label class="form-label">URL de Imagen</label>
-            <input class="form-control" formControlName="imagenUrl" type="url" placeholder="https://..." />
-
-            <span class="form-error" *ngIf="f['imagenUrl'].invalid && f['imagenUrl'].touched">
-              <i class="fa-solid fa-circle-exclamation"></i>
-              Máximo 500 caracteres.
-            </span>
-          </div>
-
-          <div class="form-group">
             <label class="form-label">
               Precio <span class="required">*</span>
             </label>
@@ -102,6 +92,44 @@
           </div>
 
           <div class="form-group col-span-2">
+            <label class="form-label">Imagen del producto</label>
+
+            <input #fileInput type="file" accept="image/*" class="d-none" (change)="onFileSelected($event)" />
+
+            <div class="image-upload-box">
+              <div class="image-upload-actions">
+                <button type="button" class="btn btn-outline btn-sm" (click)="fileInput.click()"
+                  [disabled]="uploadingImage || saving">
+                  <i class="fa-solid fa-upload"></i>
+                  Seleccionar imagen
+                </button>
+
+                <span class="upload-status" *ngIf="uploadingImage">
+                  <div class="spinner spinner-sm"></div>
+                  Subiendo imagen...
+                </span>
+
+                <span class="upload-status text-success" *ngIf="selectedFileName && !uploadingImage">
+                  <i class="fa-solid fa-circle-check"></i>
+                  {{ selectedFileName }}
+                </span>
+              </div>
+
+              <div class="upload-help-text">
+                Formatos permitidos: JPG, JPEG, PNG, WEBP. Máximo 5 MB.
+              </div>
+            </div>
+
+            <label class="form-label mt-8">O URL de Imagen</label>
+            <input class="form-control" formControlName="imagenUrl" type="url" placeholder="https://..." />
+
+            <span class="form-error" *ngIf="f['imagenUrl'].invalid && f['imagenUrl'].touched">
+              <i class="fa-solid fa-circle-exclamation"></i>
+              Máximo 500 caracteres.
+            </span>
+          </div>
+
+          <div class="form-group col-span-2">
             <label class="form-label">Estado</label>
             <div class="toggle-row">
               <label class="toggle-switch">
@@ -117,7 +145,7 @@
 
         <div class="img-preview-wrap" *ngIf="form.get('imagenUrl')?.value">
           <label class="form-label">Vista previa</label>
-          <img [src]="form.get('imagenUrl')?.value" class="img-preview" alt="preview" (error)="onImgError($event)" />
+          <img [src]="getImagenPreviewUrl()" class="img-preview" alt="preview" (error)="onImgError($event)" />
         </div>
 
         <div class="form-actions">
@@ -126,7 +154,7 @@
             Cancelar
           </a>
 
-          <button type="submit" class="btn btn-primary" [disabled]="saving">
+          <button type="submit" class="btn btn-primary" [disabled]="saving || uploadingImage">
             <span *ngIf="!saving">
               <i class="fa-solid fa-floppy-disk"></i>
               {{ modoEdicion ? 'Actualizar' : 'Guardar' }}
