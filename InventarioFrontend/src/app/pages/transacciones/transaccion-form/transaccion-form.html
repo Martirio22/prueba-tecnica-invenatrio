@@ -1,0 +1,168 @@
+<div class="page-container">
+  <div class="loading-overlay" *ngIf="loading">
+    <div class="spinner"></div>
+    <span>{{ modoEdicion ? 'Cargando transacción...' : 'Cargando datos...' }}</span>
+  </div>
+
+  <div *ngIf="!loading">
+    <a routerLink="/transacciones" class="back-link">
+      <i class="fa-solid fa-arrow-left"></i>
+      Volver a Transacciones
+    </a>
+
+    <div class="card form-card">
+      <div class="card-header">
+        <h3 class="card-title">
+          <i class="fa-solid" [ngClass]="modoEdicion ? 'fa-pencil' : 'fa-plus'"></i>
+          {{ modoEdicion ? 'Editar Transacción' : 'Nueva Transacción' }}
+        </h3>
+      </div>
+
+      <div class="stock-banner" *ngIf="productoSeleccionado">
+        <div class="stock-banner-inner">
+          <i class="fa-solid fa-cubes"></i>
+          <span>
+            Producto seleccionado:
+            <strong>{{ productoSeleccionado.nombre }}</strong>
+            &nbsp;|&nbsp;
+            Stock disponible:
+            <strong [ngClass]="
+                productoSeleccionado.stock > 5
+                  ? 'stock-ok'
+                  : productoSeleccionado.stock > 0
+                    ? 'stock-warn'
+                    : 'stock-low'
+              ">
+              {{ productoSeleccionado.stock }} unidades
+            </strong>
+          </span>
+        </div>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="guardar()" novalidate>
+        <div class="form-grid">
+          <div class="form-group col-span-2">
+            <label class="form-label">
+              Producto <span class="required">*</span>
+            </label>
+            <select class="form-control" formControlName="idProducto">
+              <option [ngValue]="null" disabled>Seleccione un producto</option>
+              <option *ngFor="let p of productos" [ngValue]="p.idProducto">
+                {{ p.nombre }} — Stock: {{ p.stock }}
+              </option>
+            </select>
+            <span class="form-error" *ngIf="f['idProducto'].invalid && f['idProducto'].touched">
+              <i class="fa-solid fa-circle-exclamation"></i>
+              El producto es requerido.
+            </span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              Tipo de Transacción <span class="required">*</span>
+            </label>
+
+            <div class="tipo-toggle">
+              <button type="button" class="tipo-btn"
+                [class.tipo-compra]="form.get('tipoTransaccion')?.value === 'Compra'"
+                (click)="form.get('tipoTransaccion')?.setValue('Compra')">
+                <i class="fa-solid fa-arrow-down"></i>
+                Compra
+              </button>
+
+              <button type="button" class="tipo-btn" [class.tipo-venta]="form.get('tipoTransaccion')?.value === 'Venta'"
+                (click)="form.get('tipoTransaccion')?.setValue('Venta')">
+                <i class="fa-solid fa-arrow-up"></i>
+                Venta
+              </button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              Cantidad <span class="required">*</span>
+            </label>
+            <input class="form-control" type="number" formControlName="cantidad" min="1" placeholder="0" />
+
+            <span class="form-error" *ngIf="f['cantidad'].invalid && f['cantidad'].touched">
+              <i class="fa-solid fa-circle-exclamation"></i>
+
+              <span *ngIf="f['cantidad'].errors?.['required']">
+                La cantidad es requerida.
+              </span>
+
+              <span *ngIf="f['cantidad'].errors?.['min']">
+                La cantidad debe ser al menos 1.
+              </span>
+
+              <span *ngIf="f['cantidad'].errors?.['stockInsuficiente']">
+                Stock insuficiente. Disponible: {{ productoSeleccionado?.stock ?? 0 }} unidades.
+              </span>
+            </span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              Precio Unitario <span class="required">*</span>
+            </label>
+            <div class="input-prefix-wrap">
+              <span class="input-prefix">$</span>
+              <input class="form-control has-prefix" type="number" formControlName="precioUnitario" min="0" step="0.01"
+                placeholder="0.00" />
+            </div>
+
+            <span class="form-error" *ngIf="f['precioUnitario'].invalid && f['precioUnitario'].touched">
+              <i class="fa-solid fa-circle-exclamation"></i>
+
+              <span *ngIf="f['precioUnitario'].errors?.['required']">
+                El precio es requerido.
+              </span>
+
+              <span *ngIf="f['precioUnitario'].errors?.['min']">
+                El precio no puede ser negativo.
+              </span>
+            </span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Precio Total</label>
+            <div class="input-prefix-wrap">
+              <span class="input-prefix">$</span>
+              <input class="form-control has-prefix total-field" type="text" formControlName="precioTotal" readonly />
+            </div>
+          </div>
+
+          <div class="form-group col-span-2">
+            <label class="form-label">Detalle</label>
+            <textarea class="form-control textarea" formControlName="detalle" rows="3"
+              placeholder="Detalle o notas de la transacción..."></textarea>
+
+            <span class="form-error" *ngIf="f['detalle'].invalid && f['detalle'].touched">
+              <i class="fa-solid fa-circle-exclamation"></i>
+              Máximo 500 caracteres.
+            </span>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <a routerLink="/transacciones" class="btn btn-outline">
+            <i class="fa-solid fa-xmark"></i>
+            Cancelar
+          </a>
+
+          <button type="submit" class="btn btn-primary" [disabled]="saving">
+            <span *ngIf="!saving">
+              <i class="fa-solid fa-floppy-disk"></i>
+              {{ modoEdicion ? 'Actualizar' : 'Registrar' }}
+            </span>
+
+            <span *ngIf="saving">
+              <div class="spinner spinner-sm"></div>
+              Guardando...
+            </span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

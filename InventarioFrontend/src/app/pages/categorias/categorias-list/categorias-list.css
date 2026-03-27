@@ -1,0 +1,106 @@
+.page-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ml-8 {
+  margin-left: 8px;
+}
+
+.required {
+  color: var(--danger);
+  margin-left: 2px;
+}
+
+.text-muted {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.action-btns {
+  display: flex;
+  gap: 6px;
+}
+
+.form-panel {
+  border-color: rgba(79, 142, 247, 0.25);
+}
+
+.form-actions-inline {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.search-input {
+  width: 200px;
+  padding: 7px 12px;
+}
+
+/* Toggle switch (reused from producto-form) */
+.toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  inset: 0;
+  background: var(--bg-3);
+  border-radius: 99px;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.toggle-slider::before {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  left: 3px;
+  top: 3px;
+  background: var(--text-muted);
+  border-radius: 50%;
+  transition: var(--transition);
+}
+
+.toggle-switch input:checked+.toggle-slider {
+  background: rgba(79, 142, 247, 0.2);
+  border-color: var(--accent);
+}
+
+.toggle-switch input:checked+.toggle-slider::before {
+  transform: translateX(20px);
+  background: var(--accent);
+}
+
+.toggle-label {
+  font-size: 13px;
+  color: var(--text-muted);
+}

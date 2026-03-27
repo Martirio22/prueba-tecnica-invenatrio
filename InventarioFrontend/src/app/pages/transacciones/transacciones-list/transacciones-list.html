@@ -1,0 +1,154 @@
+<div class="page-container">
+  <div class="filters-bar">
+    <div class="filter-group">
+      <label class="filter-label">Producto</label>
+      <select class="form-control" [(ngModel)]="filtro.idProducto">
+        <option [ngValue]="undefined">Todos</option>
+        <option *ngFor="let p of productos" [ngValue]="p.idProducto">
+          {{ p.nombre }}
+        </option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label class="filter-label">Tipo</label>
+      <select class="form-control" [(ngModel)]="filtro.tipoTransaccion">
+        <option value="">Todos</option>
+        <option value="Compra">Compra</option>
+        <option value="Venta">Venta</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label class="filter-label">Fecha desde</label>
+      <input class="form-control" type="date" [(ngModel)]="filtro.fechaInicio" />
+    </div>
+
+    <div class="filter-group">
+      <label class="filter-label">Fecha hasta</label>
+      <input class="form-control" type="date" [(ngModel)]="filtro.fechaFin" />
+    </div>
+
+    <div class="filter-actions">
+      <button class="btn btn-primary btn-sm" (click)="buscar()">
+        <i class="fa-solid fa-magnifying-glass"></i> Buscar
+      </button>
+
+      <button class="btn btn-outline btn-sm" (click)="limpiarFiltros()">
+        <i class="fa-solid fa-broom"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">
+        <i class="fa-solid fa-right-left"></i>
+        Transacciones
+        <span class="badge badge-info ml-8" *ngIf="totalItems > 0">{{ totalItems }}</span>
+      </h3>
+
+      <a routerLink="/transacciones/nueva" class="btn btn-primary">
+        <i class="fa-solid fa-plus"></i> Nueva Transacción
+      </a>
+    </div>
+
+    <div class="loading-overlay" *ngIf="loading">
+      <div class="spinner"></div>
+      <span>Cargando transacciones...</span>
+    </div>
+
+    <div class="table-wrapper" *ngIf="!loading">
+      <table *ngIf="transacciones.length > 0; else emptyTpl">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Fecha</th>
+            <th>Tipo</th>
+            <th>Producto</th>
+            <th>Cantidad</th>
+            <th>P. Unitario</th>
+            <th>P. Total</th>
+            <th>Detalle</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let t of transacciones">
+            <td class="text-muted">{{ t.idTransaccionInventario }}</td>
+            <td>{{ t.fecha | date:'dd/MM/yyyy HH:mm' }}</td>
+
+            <td>
+              <span class="badge" [ngClass]="t.tipoTransaccion === 'Compra' ? 'badge-success' : 'badge-warning'">
+                <i class="fa-solid" [ngClass]="t.tipoTransaccion === 'Compra' ? 'fa-arrow-down' : 'fa-arrow-up'"></i>
+                {{ t.tipoTransaccion }}
+              </span>
+            </td>
+
+            <td>
+              <div class="product-name">{{ t.nombreProducto }}</div>
+              <div class="product-stock" *ngIf="t.stockActualProducto != null">
+                <i class="fa-solid fa-cubes"></i>
+                Stock: {{ t.stockActualProducto }}
+              </div>
+            </td>
+
+            <td class="qty-cell">{{ t.cantidad | number }}</td>
+            <td class="price-cell">$ {{ t.precioUnitario | number:'1.2-2' }}</td>
+            <td class="price-cell total">$ {{ t.precioTotal | number:'1.2-2' }}</td>
+
+            <td>
+              <span class="detalle-text" *ngIf="t.detalle" [title]="t.detalle">
+                {{ t.detalle | slice:0:40 }}{{ t.detalle.length > 40 ? '…' : '' }}
+              </span>
+              <span class="text-muted" *ngIf="!t.detalle">—</span>
+            </td>
+
+            <td>
+              <div class="action-btns">
+                <a [routerLink]="['/transacciones/editar', t.idTransaccionInventario]"
+                  class="btn btn-outline btn-sm btn-icon" title="Editar">
+                  <i class="fa-solid fa-pencil"></i>
+                </a>
+
+                <button class="btn btn-danger btn-sm btn-icon" (click)="confirmarEliminar(t)" title="Eliminar">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <ng-template #emptyTpl>
+        <div class="empty-state">
+          <i class="fa-solid fa-receipt"></i>
+          <p>No se encontraron transacciones con los filtros aplicados.</p>
+        </div>
+      </ng-template>
+    </div>
+
+    <div class="pagination" *ngIf="!loading && totalPaginas > 1">
+      <span class="pagination-info">
+        Mostrando {{ desde }}–{{ hasta }} de {{ totalItems }} transacciones
+      </span>
+
+      <div class="pagination-controls">
+        <button class="page-btn" (click)="cambiarPagina((filtro.page ?? 1) - 1)" [disabled]="filtro.page === 1">
+          <i class="fa-solid fa-chevron-left"></i>
+        </button>
+
+        <button *ngFor="let p of paginas" class="page-btn" [class.active]="p === filtro.page"
+          (click)="cambiarPagina(p)">
+          {{ p }}
+        </button>
+
+        <button class="page-btn" (click)="cambiarPagina((filtro.page ?? 1) + 1)"
+          [disabled]="filtro.page === totalPaginas">
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

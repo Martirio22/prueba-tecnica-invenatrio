@@ -1,0 +1,43 @@
+.page-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.ml-8 {
+  margin-left: 8px;
+}
+
+.text-muted {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.product-name {
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.product-desc {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.price-cell {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.action-btns {
+  display: flex;
+  gap: 6px;
+}
+
+.filter-actions {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  padding-bottom: 1px;
+}

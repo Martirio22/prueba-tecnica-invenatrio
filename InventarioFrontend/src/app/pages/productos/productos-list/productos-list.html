@@ -1,0 +1,175 @@
+<div class="page-container">
+  <div class="filters-bar">
+    <div class="filter-group">
+      <label class="filter-label">Nombre</label>
+      <input class="form-control" type="text" placeholder="Buscar producto..." [(ngModel)]="filtro.nombre"
+        (keyup.enter)="buscar()" />
+    </div>
+
+    <div class="filter-group">
+      <label class="filter-label">Categoría</label>
+      <select class="form-control" [(ngModel)]="filtro.idCategoria">
+        <option [ngValue]="undefined">Todas</option>
+        <option *ngFor="let cat of categorias" [ngValue]="cat.idCategoria">
+          {{ cat.nombre }}
+        </option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label class="filter-label">Precio mín.</label>
+      <input class="form-control" type="number" placeholder="0" [(ngModel)]="filtro.precioMin" min="0" />
+    </div>
+
+    <div class="filter-group">
+      <label class="filter-label">Precio máx.</label>
+      <input class="form-control" type="number" placeholder="9999" [(ngModel)]="filtro.precioMax" min="0" />
+    </div>
+
+    <div class="filter-group">
+      <label class="filter-label">Estado</label>
+      <select class="form-control" [(ngModel)]="filtro.estado">
+        <option [ngValue]="undefined">Todos</option>
+        <option [ngValue]="true">Activo</option>
+        <option [ngValue]="false">Inactivo</option>
+      </select>
+    </div>
+
+    <div class="filter-actions">
+      <button class="btn btn-primary btn-sm" (click)="buscar()">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        Buscar
+      </button>
+
+      <button class="btn btn-outline btn-sm" (click)="limpiarFiltros()">
+        <i class="fa-solid fa-broom"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">
+        <i class="fa-solid fa-box"></i>
+        Productos
+        <span class="badge badge-info ml-8" *ngIf="totalItems > 0">{{ totalItems }}</span>
+      </h3>
+
+      <a routerLink="/productos/nuevo" class="btn btn-primary">
+        <i class="fa-solid fa-plus"></i>
+        Nuevo Producto
+      </a>
+    </div>
+
+    <div class="loading-overlay" *ngIf="loading">
+      <div class="spinner"></div>
+      <span>Cargando productos...</span>
+    </div>
+
+    <div class="table-wrapper" *ngIf="!loading">
+      <table *ngIf="productos.length > 0; else emptyTpl">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Imagen</th>
+            <th>Nombre</th>
+            <th>Categoría</th>
+            <th>Precio</th>
+            <th>Stock</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let p of productos; let i = index">
+            <td class="text-muted">
+              {{ ((filtro.page ?? 1) - 1) * (filtro.pageSize ?? 10) + i + 1 }}
+            </td>
+
+            <td>
+              <img *ngIf="p.imagenUrl; else noImg" [src]="p.imagenUrl" class="product-img" [alt]="p.nombre" />
+              <ng-template #noImg>
+                <div class="product-img-placeholder">
+                  <i class="fa-solid fa-image"></i>
+                </div>
+              </ng-template>
+            </td>
+
+            <td>
+              <div class="product-name">{{ p.nombre }}</div>
+              <div class="product-desc" *ngIf="p.descripcion">
+                {{ p.descripcion | slice:0:60 }}{{ p.descripcion.length > 60 ? '…' : '' }}
+              </div>
+            </td>
+
+            <td>
+              <span class="badge badge-info">
+                {{ p.categoriaNombre || nombreCategoria(p.idCategoria) }}
+              </span>
+            </td>
+
+            <td class="price-cell">$ {{ p.precio | number:'1.2-2' }}</td>
+
+            <td>
+              <span class="badge"
+                [ngClass]="p.stock > 5 ? 'badge-success' : p.stock > 0 ? 'badge-warning' : 'badge-danger'">
+                <i class="fa-solid fa-cubes"></i>
+                {{ p.stock }}
+              </span>
+            </td>
+
+            <td>
+              <span class="badge" [ngClass]="p.estado ? 'badge-success' : 'badge-danger'">
+                <i class="fa-solid" [ngClass]="p.estado ? 'fa-circle-check' : 'fa-circle-xmark'"></i>
+                {{ p.estado ? 'Activo' : 'Inactivo' }}
+              </span>
+            </td>
+
+            <td>
+              <div class="action-btns">
+                <a [routerLink]="['/productos/editar', p.idProducto]" class="btn btn-outline btn-sm btn-icon"
+                  title="Editar">
+                  <i class="fa-solid fa-pencil"></i>
+                </a>
+
+                <button class="btn btn-danger btn-sm btn-icon" (click)="confirmarEliminar(p)" title="Eliminar">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <ng-template #emptyTpl>
+        <div class="empty-state">
+          <i class="fa-solid fa-box-open"></i>
+          <p>No se encontraron productos con los filtros aplicados.</p>
+        </div>
+      </ng-template>
+    </div>
+
+    <div class="pagination" *ngIf="!loading && totalPaginas > 1">
+      <span class="pagination-info">
+        Mostrando {{ desde }}–{{ hasta }} de {{ totalItems }} productos
+      </span>
+
+      <div class="pagination-controls">
+        <button class="page-btn" (click)="cambiarPagina((filtro.page ?? 1) - 1)" [disabled]="filtro.page === 1">
+          <i class="fa-solid fa-chevron-left"></i>
+        </button>
+
+        <button *ngFor="let p of paginas" class="page-btn" [class.active]="p === filtro.page"
+          (click)="cambiarPagina(p)">
+          {{ p }}
+        </button>
+
+        <button class="page-btn" (click)="cambiarPagina((filtro.page ?? 1) + 1)"
+          [disabled]="filtro.page === totalPaginas">
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
