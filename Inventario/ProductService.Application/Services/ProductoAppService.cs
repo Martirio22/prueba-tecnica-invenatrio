@@ -59,7 +59,8 @@ namespace ProductService.Application.Services
                 ImagenUrl = request.ImagenUrl,
                 Precio = request.Precio,
                 Stock = request.Stock,
-                Estado = request.Estado
+                Estado = request.Estado,
+                FechaCreacion = DateTime.UtcNow
             };
 
             await _productoRepository.AddAsync(entity);

@@ -26,6 +26,7 @@
 
 //------------------------------------------------------------
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using ProductService.API.Middlewares;
 using ProductService.Application.Interfaces;
 using ProductService.Application.Services;
@@ -51,10 +52,8 @@ builder.Services.AddScoped<IProductoAppService>(sp =>
     var categoriaRepository = sp.GetRequiredService<ICategoriaRepository>();
     var env = sp.GetRequiredService<IWebHostEnvironment>();
 
-    var uploadRoot = Path.Combine(
-        env.WebRootPath ?? Path.Combine(env.ContentRootPath, "wwwroot"),
-        "uploads",
-        "productos");
+    var webRootPath = Path.Combine(env.ContentRootPath, "wwwroot");
+    var uploadRoot = Path.Combine(webRootPath, "uploads", "productos");
 
     return new ProductoAppService(productoRepository, categoriaRepository, uploadRoot);
 });
@@ -69,14 +68,31 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+var webRootPath = Path.Combine(app.Environment.ContentRootPath, "wwwroot");
+var uploadsPath = Path.Combine(webRootPath, "uploads");
+var productosPath = Path.Combine(uploadsPath, "productos");
+
+if (!Directory.Exists(webRootPath))
+    Directory.CreateDirectory(webRootPath);
+
+if (!Directory.Exists(uploadsPath))
+    Directory.CreateDirectory(uploadsPath);
+
+if (!Directory.Exists(productosPath))
+    Directory.CreateDirectory(productosPath);
+
 app.UseSwagger();
 app.UseSwaggerUI();
 
-app.UseStaticFiles();
+app.UseHttpsRedirection();
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(webRootPath),
+    RequestPath = ""
+});
 
 app.UseCors("AllowAngular");
-
-app.UseHttpsRedirection();
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
