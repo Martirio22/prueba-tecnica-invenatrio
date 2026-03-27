@@ -1,0 +1,19 @@
+# .NET
+**/bin/
+**/obj/
+
+# Angular / Node
+**/node_modules/
+**/dist/
+
+# Visual Studio
+.vs/
+**/.vs/
+*.user
+*.slnLaunch.user
+
+# VS Code
+.vscode/
+
+# Logs
+*.log
