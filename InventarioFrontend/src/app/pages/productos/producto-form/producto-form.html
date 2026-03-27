@@ -143,9 +143,9 @@
           </div>
         </div>
 
-        <div class="img-preview-wrap" *ngIf="form.get('imagenUrl')?.value">
+        <div class="img-preview-wrap" *ngIf="previewImageUrl || form.get('imagenUrl')?.value">
           <label class="form-label">Vista previa</label>
-          <img [src]="getImagenPreviewUrl()" class="img-preview" alt="preview" (error)="onImgError($event)" />
+          <img [src]="getImagenMostrada()" class="img-preview" alt="preview" (error)="onImgError($event)" />
         </div>
 
         <div class="form-actions">

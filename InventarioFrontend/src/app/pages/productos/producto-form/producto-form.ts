@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Categoria } from '../../../core/models/categoria.model';
@@ -17,7 +17,7 @@ import { environment } from '../../../../environments/environment';
   templateUrl: './producto-form.html',
   styleUrl: './producto-form.css',
 })
-export class ProductoForm implements OnInit {
+export class ProductoForm implements OnInit, OnDestroy {
   form!: FormGroup;
   categorias: Categoria[] = [];
   loading = false;
@@ -29,6 +29,8 @@ export class ProductoForm implements OnInit {
 
   uploadingImage = false;
   selectedFileName = '';
+
+  previewImageUrl: string | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -48,6 +50,12 @@ export class ProductoForm implements OnInit {
     }
 
     this.cargarCategorias();
+  }
+
+  ngOnDestroy(): void {
+    if (this.previewImageUrl) {
+      URL.revokeObjectURL(this.previewImageUrl);
+    }
   }
 
   private buildForm(): void {
@@ -140,6 +148,13 @@ export class ProductoForm implements OnInit {
     }
 
     this.selectedFileName = file.name;
+
+    if (this.previewImageUrl) {
+      URL.revokeObjectURL(this.previewImageUrl);
+    }
+
+    this.previewImageUrl = URL.createObjectURL(file);
+
     this.subirImagen(file);
   }
 
@@ -216,6 +231,22 @@ export class ProductoForm implements OnInit {
   }
 
   getImagenPreviewUrl(): string {
+    const imagenUrl = this.form.get('imagenUrl')?.value;
+
+    if (!imagenUrl) return '';
+
+    if (imagenUrl.startsWith('http://') || imagenUrl.startsWith('https://')) {
+      return imagenUrl;
+    }
+
+    return `${this.apiBaseUrl}${imagenUrl}`;
+  }
+
+  getImagenMostrada(): string {
+    if (this.previewImageUrl) {
+      return this.previewImageUrl;
+    }
+
     const imagenUrl = this.form.get('imagenUrl')?.value;
 
     if (!imagenUrl) return '';

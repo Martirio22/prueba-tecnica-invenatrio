@@ -1,7 +1,3 @@
-/* ============================================
-   GLOBAL STYLES - InvStock
-   ============================================ */
-
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;600;700&display=swap');
 
 :root {
@@ -43,7 +39,6 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* ============ SCROLLBAR ============ */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -58,14 +53,12 @@ body {
   border-radius: 99px;
 }
 
-/* ============ APP SHELL ============ */
 .app-shell {
   display: flex;
   height: 100vh;
   overflow: hidden;
 }
 
-/* ============ SIDEBAR ============ */
 .sidebar {
   width: var(--sidebar-w);
   background: var(--bg-2);
@@ -201,7 +194,6 @@ body {
   text-align: center;
 }
 
-/* ============ MAIN WRAPPER ============ */
 .main-wrapper {
   flex: 1;
   display: flex;
@@ -248,7 +240,6 @@ body {
   padding: 24px;
 }
 
-/* ============ CARD ============ */
 .card {
   background: var(--card-bg);
   border: 1px solid var(--border);
@@ -273,7 +264,6 @@ body {
   color: var(--text);
 }
 
-/* ============ BUTTONS ============ */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -344,7 +334,6 @@ body {
   padding: 7px;
 }
 
-/* ============ TABLE ============ */
 .table-wrapper {
   overflow-x: auto;
 }
@@ -394,7 +383,6 @@ tbody tr:last-child {
   border-bottom: none;
 }
 
-/* ============ BADGE ============ */
 .badge {
   display: inline-flex;
   align-items: center;
@@ -425,7 +413,6 @@ tbody tr:last-child {
   color: var(--accent);
 }
 
-/* ============ FORM FIELDS ============ */
 .form-group {
   display: flex;
   flex-direction: column;
@@ -478,7 +465,6 @@ select.form-control option {
   gap: 4px;
 }
 
-/* ============ FORM GRID ============ */
 .form-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -493,7 +479,6 @@ select.form-control option {
   grid-column: span 2;
 }
 
-/* ============ FILTERS BAR ============ */
 .filters-bar {
   display: flex;
   align-items: flex-end;
@@ -521,7 +506,6 @@ select.form-control option {
   letter-spacing: 0.06em;
 }
 
-/* ============ PAGINATION ============ */
 .pagination {
   display: flex;
   align-items: center;
@@ -574,7 +558,6 @@ select.form-control option {
   cursor: not-allowed;
 }
 
-/* ============ EMPTY STATE ============ */
 .empty-state {
   text-align: center;
   padding: 60px 20px;
@@ -592,7 +575,6 @@ select.form-control option {
   font-size: 14px;
 }
 
-/* ============ LOADING ============ */
 .loading-overlay {
   display: flex;
   align-items: center;
@@ -617,7 +599,6 @@ select.form-control option {
   }
 }
 
-/* ============ PRODUCT IMAGE ============ */
 .product-img {
   width: 40px;
   height: 40px;
@@ -639,7 +620,6 @@ select.form-control option {
   color: var(--text-muted);
 }
 
-/* ============ MAT OVERRIDES ============ */
 .mat-mdc-dialog-container {
   --mdc-dialog-container-color: var(--bg-2) !important;
   --mdc-dialog-subhead-color: var(--text) !important;
@@ -651,7 +631,6 @@ select.form-control option {
   font-family: 'Space Grotesk', sans-serif !important;
 }
 
-/* ============ RESPONSIVE ============ */
 @media (max-width: 768px) {
   .form-grid {
     grid-template-columns: 1fr;
